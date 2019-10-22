@@ -8,8 +8,15 @@ namespace CoffeeMug.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ProductController : ControllerBase
     {
+        //private readonly IProductRepository
+
+        public ProductController()
+        {
+
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
