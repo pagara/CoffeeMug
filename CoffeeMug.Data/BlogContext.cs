@@ -1,13 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CoffeeMug.Data.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace CoffeeMug.Data
 {
-    class BlogContext : DbContext
+    public class BlogContext : DbContext
     {
-        static void Main(string[] args)
+        public DbSet<Product> Products { get; set; }
+
+        public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Console.WriteLine("Hello World!");
+            ConfigureModelBuilderForUser(modelBuilder);
+        }
+
+        void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Product>().ToTable("Product");
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .IsRequired();
         }
     }
 }
