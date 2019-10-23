@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace CoffeeMug.Data.Repositories
 {
@@ -32,7 +31,8 @@ namespace CoffeeMug.Data.Repositories
 
         public T Get(Expression<Func<T, bool>> predicate)
         {
-            throw new NotImplementedException();
+            IQueryable<T> entity = _context.Set<T>();
+            return entity.FirstOrDefault(predicate);
         }
 
         public IEnumerable<T> GetAll()
@@ -42,7 +42,8 @@ namespace CoffeeMug.Data.Repositories
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
+            dbEntityEntry.State = EntityState.Modified;
         }
 
         public virtual void Commit()

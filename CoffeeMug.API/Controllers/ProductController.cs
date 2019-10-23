@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CoffeeMug.Data.Abstract;
 using CoffeeMug.Data.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -23,28 +21,36 @@ namespace CoffeeMug.API.Controllers
         public ActionResult<IEnumerable<Product>> Get()
         {
             var products = _productRepository.GetAll();
-            return Ok(_productRepository.GetAll());
+            if (products == null) return BadRequest();
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<string> GetById(Guid id)
+        public ActionResult<Product> GetById(Guid id)
         {
             var product = _productRepository.Get(x => x.Id == id);
-            if (product == null) return BadRequest(new { name = "Product does not exist!" });
+            if (product == null) return BadRequest("Product does not exist!");
             return Ok(product);
         }
 
         [HttpPost]
-        public void Post([FromBody] Product product)
+        public ActionResult Post([FromBody] Product product)
         {
-
-            _productRepository.Add(product);
-            _productRepository.Commit();
+            bool canAdd = _productRepository.IsProductIdValid(product.Id);
+            if (canAdd)
+            {
+                _productRepository.Add(product);
+                _productRepository.Commit();
+                return Ok();
+            }
+            return BadRequest("Product already exists!");
         }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put([FromBody]Product product)
         {
+            _productRepository.Update(product);
+            _productRepository.Commit();
         }
 
         [HttpDelete]
