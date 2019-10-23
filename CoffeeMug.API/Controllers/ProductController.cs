@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoffeeMug.Data.Abstract;
+using CoffeeMug.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoffeeMug.API.Controllers
@@ -10,43 +12,45 @@ namespace CoffeeMug.API.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        //private readonly IProductRepository
+        private readonly IProductRepository _productRepository;
 
-        public ProductController()
+        public ProductController(IProductRepository productRepository)
         {
-
+            _productRepository = productRepository;
         }
 
-        // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<Product>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var products = _productRepository.GetAll();
+            return Ok(_productRepository.GetAll());
         }
 
-        // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<string> GetById(Guid id)
         {
-            return "value";
+            var product = _productRepository.Get(x => x.Id == id);
+            if (product == null) return BadRequest(new { name = "Product does not exist!" });
+            return Ok(product);
         }
 
-        // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Product product)
         {
+
+            _productRepository.Add(product);
+            _productRepository.Commit();
         }
 
-        // PUT api/values/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete]
+        public void Delete(Product product)
         {
+            _productRepository.Delete(product);
         }
     }
 }

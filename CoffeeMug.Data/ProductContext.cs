@@ -1,17 +1,22 @@
 ﻿using CoffeeMug.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 
 namespace CoffeeMug.Data
 {
-    public class BlogContext : DbContext
+    public class ProductContext : DbContext
     {
         public DbSet<Product> Products { get; set; }
 
-        public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
+        public ProductContext(DbContextOptions<ProductContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            }
             ConfigureModelBuilderForUser(modelBuilder);
         }
 
